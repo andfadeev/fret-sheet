@@ -90,10 +90,15 @@ function NoteAnswer({ note }: NoteAnswerProps) {
     </li>
 }
 
-function App() {
-    // const [msg, setMsg] = useState(data[0])
-    // const [note, setNote] = useState(getRandomNote(frets))
+function RadioLabel({htmlFor, content}) {
+    return <motion.label htmlFor={htmlFor}
+                         whileHover={{ scale: 1.05 }}
+                         whileTap={{ scale: 0.95 }}
+                         className="opacity-75 hover:opacity-100 block items-center justify-between p-5 text-gray-500 border border-gray-500 rounded-3xl cursor-pointer text-center peer-checked:border-gray-600 peer-checked:text-white peer-checked:bg-gray-600 peer-checked:opacity-100"
+    >{content}</motion.label>
+}
 
+function App() {
     const validateAnswer = () => {
         console.log("in validate")
         // if (selectedNote === currentNote.title && fretNumber === currentNote.location.fret) {
@@ -118,10 +123,6 @@ function App() {
         }
     }, [selectedNote, fretNumber]);
 
-    // const handleClick = () => {
-    //     setNote(getRandomNote(frets));
-    // };
-
     return (
         <div className={'container mx-auto p-5'}>
 
@@ -130,20 +131,11 @@ function App() {
                     <img src={note1} alt="Music Note"/>
                 </div>
                 <div className="col-span-3 md:col-span-2 border border-gray-400 p-10 rounded-3xl">
+
+
+
+
                     <h3 className="text-xl text-gray-900 font-extrabold">pick note</h3>
-                    {/*<ul className="mt-5 flex gap-2">*/}
-
-                    {/*    <NoteAnswer note={'A'}/>*/}
-                    {/*    <NoteAnswer note={'B'}/>*/}
-                    {/*    <NoteAnswer note={'C'}/>*/}
-                    {/*    <NoteAnswer note={'D'}/>*/}
-                    {/*    <NoteAnswer note={'E'}/>*/}
-                    {/*    <NoteAnswer note={'F'}/>*/}
-                    {/*    <NoteAnswer note={'G'}/>*/}
-
-
-                    {/*</ul>*/}
-
                     <form className="mt-5 flex flex-wrap gap-2">
                         {["A", "B", "C", "D", "E", "F", "G"].map((note) => (
                             <div key={note} >
@@ -156,11 +148,8 @@ function App() {
                                     onChange={(e) => setSelectedNote(e.target.value)}
                                     className="hidden peer"
                                 />
-                                <label htmlFor={note}
-                                       className = "block items-center justify-between p-5 text-gray-500 border border-gray-500 rounded-3xl cursor-pointer hover:text-gray-600 hover:bg-gray-100 text-center peer-checked:border-blue-600 peer-checked:text-blue-600"
-
-
-                                >{note}</label>
+                                <RadioLabel htmlFor={note}
+                                content={note}/>
                             </div>
                         ))}
                     </form>
@@ -181,71 +170,15 @@ function App() {
                                         onChange={(e) => setFretNumber(e.target.value)}
                                         className="hidden peer"
                                     />
-                                    <label htmlFor={`fret-${num}`}
-
-
-                                           className = "block items-center justify-between p-5 text-gray-500 border border-gray-500 rounded-3xl cursor-pointer hover:text-gray-600 hover:bg-gray-100 text-center peer-checked:border-blue-600 peer-checked:text-blue-600">{num}</label>
+                                    <RadioLabel htmlFor={`fret-${num}`}
+                                                content={num}/>
                                 </div>
                             ))}
                     </form>
 
-                    {/*<ul className="gap-2 flex flex-wrap mt-5">*/}
-
-                    {/*    {Array.from({ length: 13 }, (_, i) => (*/}
-                    {/*        <li className={"items-center justify-between p-5 text-gray-500 bg-white border border-gray-200 rounded-xl cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 dark:peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 text-center"} key={i}>{i}</li>*/}
-                    {/*    ))}*/}
-
-                    {/*</ul>*/}
-
-                    {/*<div>*/}
-                    {/*    <motion.button*/}
-                    {/*        // onClick={handleClick}*/}
-                    {/*        className="mt-10 inline-flex items-center justify-center h-16 px-10 py-0 text-xl font-semibold text-center text-gray-200 no-underline align-middle transition-all duration-300 ease-in-out bg-transparent border-2 border-gray-600 border-solid rounded-full cursor-pointer select-none hover:text-white hover:border-white focus:shadow-xs focus:no-underline"*/}
-                    {/*        whileHover={{ scale: 1.05 }}*/}
-                    {/*        whileTap={{ scale: 0.95 }}>Submit</motion.button>*/}
-                    {/*</div>*/}
-
-                    {/*<div className={" mt-10 mb-10 p-5 rounded-2xl"}>{JSON.stringify(currentNote)}</div>*/}
-                    {/*<div className={" mt-10 mb-10 p-5 rounded-2xl"}>*/}
-                    {/*    NOte: {selectedNote} Fret: {fretNumber}*/}
-                    {/*</div>*/}
-
-
-
-                    {/*<form className="mt-4">*/}
-                    {/*    {[...Array(13).keys()]*/}
-                    {/*        .map((num) => num.toString())*/}
-                    {/*        .map((num) => (*/}
-                    {/*        <div key={num} className="inline-flex items-center space-x-2 mr-2">*/}
-                    {/*            <input*/}
-                    {/*                type="radio"*/}
-                    {/*                id={`fret-${num}`}*/}
-                    {/*                name="fret"*/}
-                    {/*                value={num}*/}
-                    {/*                checked={fretNumber === num}*/}
-                    {/*                onChange={(e) => setFretNumber(e.target.value)}*/}
-                    {/*            />*/}
-                    {/*            <label htmlFor={`fret-${num}`}>{num}</label>*/}
-                    {/*        </div>*/}
-                    {/*    ))}*/}
-                    {/*</form>*/}
-
+                    {/*<div className={' p-5 text-center mt-5 rounded-3xl text-xl font-extrabold text-white bg-teal-500'}>correct</div>*/}
                 </div>
-
-
             </div>
-
-
-
-
-            {/*<motion.div*/}
-            {/*    key={msg}*/}
-            {/*    initial={{ scale: 0 }} animate={{ scale: 1 }}  className={'border border-white mt-10 mb-10 rounded-xl text-white p-5'}>{msg}*/}
-            {/*</motion.div>*/}
-
-
-
-
       </div>
   )
 }
