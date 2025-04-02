@@ -1,66 +1,26 @@
 import {useEffect, useState} from 'react'
-import note1 from './assets/note1.svg'
+import E2 from './assets/E2.svg'
+import F2 from './assets/F2.svg'
 import './App.css'
 import { motion } from "motion/react"
-import { toast } from "react-hot-toast";
 
 
-const data = ["Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries", "It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."]
-
-
-const frets = [
-    {
-        image: note1,
-        title: "A",
-        titleAlternative: "la",
-        locations: [
-            {
-                string: 6,
-                fret: 5
-            },
-            {
-                string: 5,
-                fret: 0
-            },
-        ]
-    },
-    {
-        "image": "note5",
-        "title": "B2",
-        "titleAlternative": "si",
-        "locations": [
-            { "string": 6, "fret": 7 },
-            { "string": 5, "fret": 2 }
-        ]
-    },
-]
+// E2 to E3: Open 6th string (E2) to 12th fret 6th string (E3)
+// A2 to A3: Open 5th string (A2) to 12th fret 5th string (A3)
+// D3 to D4: Open 4th string (D3) to 12th fret 4th string (D4)
+// G3 to G4: Open 3rd string (G3) to 12th fret 3rd string (G4)
+// B3 to B4: Open 2nd string (B3) to 12th fret 2nd string (B4)
+// E4 to E5 (or E6): Open 1st string (E4) to around 19th-24th fret (E6 if available)
 
 const guitarNotes = [
-    { title: "E", locations: [{ string: "6", fret: "0" }] },
-    { title: "A", locations: [{ string: "6", fret: "5" }, { string: "5", fret: "0" }] },
-    { title: "D", locations: [{ string: "5", fret: "5" }, { string: "4", fret: "0" }] },
-    { title: "G", locations: [{ string: "3", fret: "0" }] },
-    { title: "B", locations: [{ string: "2", fret: "0" }] },
-    { title: "E", locations: [{ string: "1", fret: "0" }] }
+    { id: "E2", image: E2, title: "E", locations: [{ string: "6", fret: "0" }] },
+    { id: "F2", image: F2, title: "F", locations: [{ string: "6", fret: "1" }] },
+    // { title: "A", locations: [{ string: "6", fret: "5" }, { string: "5", fret: "0" }] },
+    // { title: "D", locations: [{ string: "5", fret: "5" }, { string: "4", fret: "0" }] },
+    // { title: "G", locations: [{ string: "3", fret: "0" }] },
+    // { title: "B", locations: [{ string: "2", fret: "0" }] },
+    // { title: "E", locations: [{ string: "1", fret: "0" }] }
 ];
-
-
-// function getRandomNote(notes) {
-//     if (!notes || notes.length === 0) return null;
-//
-//     // Pick a random note from the list
-//     const randomNote = notes[Math.floor(Math.random() * notes.length)];
-//
-//     // Pick a random location from the selected note
-//     const randomLocation = randomNote.locations[Math.floor(Math.random() * randomNote.locations.length)];
-//
-//     return {
-//         image: randomNote.image,
-//         title: randomNote.title,
-//         titleAlternative: randomNote.titleAlternative,
-//         ... randomLocation
-//     };
-// }
 
 const getRandomNote = () => {
     const randomNote = guitarNotes[Math.floor(Math.random() * guitarNotes.length)];
@@ -68,29 +28,13 @@ const getRandomNote = () => {
     return { ...randomNote, location: randomLocation };
 };
 
-
-
-type NoteAnswerProps = {
-    note: string;
+type RadioLabelProps = {
+    htmlFor: string;
+    content: string;
 };
 
-function NoteAnswer({ note }: NoteAnswerProps) {
-    return <li>
-        <input type="radio"
-               id={note}
-               name="hosting"
-               value="hosting-small"
-               className="hidden peer" required/>
-        <label htmlFor={note}
-               className="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-3xl cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 dark:peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
-            <div className="block">
-                <div className="w-full text-lg font-semibold">{note}</div>
-            </div>
-        </label>
-    </li>
-}
 
-function RadioLabel({htmlFor, content}) {
+function RadioLabel({htmlFor, content}: RadioLabelProps) {
     return <motion.label htmlFor={htmlFor}
                          whileHover={{ scale: 1.05 }}
                          whileTap={{ scale: 0.95 }}
@@ -100,24 +44,26 @@ function RadioLabel({htmlFor, content}) {
 
 function App() {
     const validateAnswer = () => {
-        console.log("in validate")
-        // if (selectedNote === currentNote.title && fretNumber === currentNote.location.fret) {
-        if (true) {
-            toast.success("Correct! Next question...");
-            setSelectedNote(null);
-            setFretNumber(null);
-            setCurrentNote(getRandomNote());
+        if (selectedNote === currentNote.title && fretNumber === currentNote.location.fret) {
+            nextQuestion();
         } else {
-            toast.error("Incorrect! Try again.");
+            setWrongAnswer(true);
         }
     };
+
+    const nextQuestion = () => {
+        setSelectedNote(null);
+        setFretNumber(null);
+        setWrongAnswer(false);
+        setCurrentNote(getRandomNote());
+    }
 
     const [currentNote, setCurrentNote] = useState(getRandomNote);
     const [selectedNote, setSelectedNote] = useState(null);
     const [fretNumber, setFretNumber] = useState(null);
+    const [wrongAnswer, setWrongAnswer] = useState(false);
 
     useEffect(() => {
-        console.log("IN use effect" + selectedNote + " " + fretNumber)
         if (selectedNote != null && fretNumber != null) {
             validateAnswer();
         }
@@ -126,14 +72,19 @@ function App() {
     return (
         <div className={'container mx-auto p-5'}>
 
+            <div className={'border border-gray-400 p-5 flex justify-between rounded-3xl mb-5'}>
+
+                <div className={'text-3xl text-gray-900 font-extrabold'}>guitar fret wizard</div>
+                {/*<div>^</div>*/}
+
+            </div>
+
             <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-3 md:col-span-1 border border-gray-400 flex justify-center p-10 rounded-3xl">
-                    <img src={note1} alt="Music Note"/>
+                    <img src={currentNote.image}
+                         alt={currentNote.id}/>
                 </div>
                 <div className="col-span-3 md:col-span-2 border border-gray-400 p-10 rounded-3xl">
-
-
-
 
                     <h3 className="text-xl text-gray-900 font-extrabold">pick note</h3>
                     <form className="mt-5 flex flex-wrap gap-2">
@@ -154,7 +105,7 @@ function App() {
                         ))}
                     </form>
 
-                    <h2 className="mt-10 text-xl text-gray-900 font-extrabold">pick 6th string fret</h2>
+                    <h2 className="mt-10 text-xl text-gray-900 font-extrabold">pick {currentNote.location.string}th string fret</h2>
 
                     <form className="mt-5 flex flex-wrap gap-2">
                         {[...Array(13).keys()]
@@ -176,7 +127,19 @@ function App() {
                             ))}
                     </form>
 
-                    {/*<div className={' p-5 text-center mt-5 rounded-3xl text-xl font-extrabold text-white bg-teal-500'}>correct</div>*/}
+                    {wrongAnswer &&
+                        <div className={'border border-gray-400 p-5 flex gap-2 justify-between rounded-2xl mt-5 font-extrabold text-lg'}>
+                            <div>try again</div>
+
+                            <div>
+                                <button className={'underline text-gray-600 hover:text-black cursor-pointer'}
+                                        onClick={nextQuestion}
+                                >or go next</button>
+                            </div>
+                        </div>
+                    }
+
+                    {/*<div className={' p-5 text-center mt-5 rounded-3xl text-xl font-extrabold text-white bg-teal-500'}>{JSON.stringify(currentNote)}</div>*/}
                 </div>
             </div>
       </div>
