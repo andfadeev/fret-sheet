@@ -28,6 +28,22 @@ const getRandomNote = () => {
     return { ...randomNote, location: randomLocation };
 };
 
+
+const CloseIcon = () => {
+    return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+    </svg>
+
+}
+
+const MenuIcon = () => {
+    return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+
+}
+
+
 type RadioLabelProps = {
     htmlFor: string;
     content: string;
@@ -72,10 +88,15 @@ function App() {
     return (
         <div className={'container mx-auto p-5'}>
 
-            <div className={'border border-gray-400 p-5 flex justify-between rounded-3xl mb-5'}>
+            <div className={'border border-gray-400 p-5 flex justify-between items-center rounded-3xl mb-5'}>
 
-                <div className={'text-3xl text-gray-900 font-extrabold'}>guitar fret wizard</div>
-                {/*<div>^</div>*/}
+                <div className={'text-3xl text-gray-900 font-extrabold leading-none'}>guitar fret wizard</div>
+
+                {/*<div className={'text-xl text-gray-700 font-extrabold leading-none'}>open</div>*/}
+
+                <MenuIcon/>
+                <CloseIcon/>
+
 
             </div>
 
