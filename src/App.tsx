@@ -220,23 +220,23 @@ const getRandomNote = () => {
     return {...randomNote, location: randomLocation};
 };
 
+//
+// const CloseIcon = () => {
+//     return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+//         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
+//     </svg>
+//
+// }
+//
+// const MenuIcon = () => {
+//     return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
+//                 className="size-6 cursor-pointer">
+//         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+//     </svg>
+//
+// }
 
-const CloseIcon = () => {
-    return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
-    </svg>
-
-}
-
-const MenuIcon = () => {
-    return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
-                className="size-6 cursor-pointer">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
-    </svg>
-
-}
-
-function toOrdinal(numStr) {
+function toOrdinal(numStr: string) {
     const num = parseInt(numStr, 10);
     if (isNaN(num) || num < 1 || num > 6) {
         throw new Error("Input must be a string representing a number from '1' to '6'");
@@ -279,13 +279,13 @@ function App() {
     }
 
     const [currentNote, setCurrentNote] = useState(getRandomNote);
-    const [selectedNote, setSelectedNote] = useState(null);
-    const [fretNumber, setFretNumber] = useState(null);
-    const [wrongAnswer, setWrongAnswer] = useState(false);
-    const [correctAnswer, setCorrectAnswer] = useState(false);
+    const [selectedNote, setSelectedNote] = useState<string | null>(null);
+    const [fretNumber, setFretNumber] = useState<string | null>(null);
+    const [wrongAnswer, setWrongAnswer] = useState<boolean>(false);
+    const [correctAnswer, setCorrectAnswer] = useState<boolean>(false);
 
     useEffect(() => {
-        let timer;
+        let timer : number;
         if (correctAnswer) {
             timer = setTimeout(() => {
                 setCorrectAnswer(false);
