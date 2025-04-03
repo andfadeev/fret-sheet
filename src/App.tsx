@@ -25,7 +25,21 @@ import E5 from './assets/E5.svg';
 import './App.css'
 import {motion} from "motion/react"
 
-const guitarNotes = [
+type GuitarNoteLocation = {
+    string: string;
+    fret: string;
+};
+
+type GuitarNote = {
+    id: string;
+    image: string;
+    title: string;
+    locations: GuitarNoteLocation[];
+};
+
+type GuitarNoteQuestion = GuitarNote & { location: GuitarNoteLocation }
+
+const guitarNotes : GuitarNote[] = [
     {
         id: "E2", image: E2, title: "E", locations: [{string: "6", fret: "0"}]
     },
@@ -214,10 +228,25 @@ const guitarNotes = [
     }
 ];
 
+const generateAllCombinations = () => {
+    const combinations: Array<GuitarNoteQuestion> = [];
+
+    guitarNotes.forEach(note => {
+        note.locations.forEach(location => {
+            combinations.push({ ...note, location });
+        });
+    });
+
+    return combinations;
+};
+
+const guitarNoteQuestions = generateAllCombinations();
+
 const getRandomNote = () => {
-    const randomNote = guitarNotes[Math.floor(Math.random() * guitarNotes.length)];
-    const randomLocation = randomNote.locations[Math.floor(Math.random() * randomNote.locations.length)];
-    return {...randomNote, location: randomLocation};
+    // const randomNote = guitarNotes[Math.floor(Math.random() * guitarNotes.length)];
+    // const randomLocation = randomNote.locations[Math.floor(Math.random() * randomNote.locations.length)];
+    // return {...randomNote, location: randomLocation};
+    return guitarNoteQuestions[Math.floor(Math.random() * guitarNoteQuestions.length)];
 };
 
 //
