@@ -305,9 +305,10 @@ function App() {
 
             <div className={'border border-gray-400 p-5 flex justify-between items-center rounded-3xl mb-5'}>
 
-                <div className={'text-3xl text-gray-900 font-extrabold leading-none'}>guitar fret wizard</div>
+                <a
+                    href={"https://guitarfretwizard.com"}
+                    className={'block text-3xl text-gray-900 font-extrabold leading-none'}>guitar fret wizard</a>
 
-                {/*<div className={'text-xl text-gray-700 font-extrabold leading-none'}>open</div>*/}
 
                 {/*<MenuIcon/>*/}
                 {/*<CloseIcon/>*/}
@@ -404,7 +405,7 @@ function App() {
                     }
 
                     {correctAnswer && <motion.div
-                        initial={{opacity: 0, scale: 0.95}} // Start slightly smaller
+                        initial={{opacity: 0, scale: 0.95}}
                         animate={{opacity: 1, scale: 1}}  // Smoothly scale up
                         exit={{opacity: 0, scale: 0.95}}  // Fade out subtly
                         transition={{
