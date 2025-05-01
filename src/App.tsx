@@ -24,6 +24,8 @@ import E5 from './assets/E5.svg';
 
 import './App.css'
 import {motion} from "motion/react"
+import { toOrdinal } from './utils/toOrdinal'
+import { RadioLabel } from './components/RadioLabel'
 
 type GuitarNoteLocation = {
     string: string;
@@ -265,30 +267,8 @@ const getRandomNote = () => {
 //
 // }
 
-function toOrdinal(numStr: string) {
-    const num = parseInt(numStr, 10);
-    if (isNaN(num) || num < 1 || num > 6) {
-        throw new Error("Input must be a string representing a number from '1' to '6'");
-    }
-
-    const suffixes = ["th", "st", "nd", "rd", "th", "th", "th"];
-    return num + suffixes[num];
-}
 
 
-type RadioLabelProps = {
-    htmlFor: string;
-    content: string;
-};
-
-
-function RadioLabel({htmlFor, content}: RadioLabelProps) {
-    return <motion.label htmlFor={htmlFor}
-                         whileHover={{scale: 1.05}}
-                         whileTap={{scale: 0.95}}
-                         className="opacity-75 hover:opacity-100 block items-center justify-between p-5 text-gray-500 border border-gray-500 rounded-3xl cursor-pointer text-center peer-checked:border-gray-600 peer-checked:text-white peer-checked:bg-gray-600 peer-checked:opacity-100"
-    >{content}</motion.label>
-}
 
 function App() {
     const validateAnswer = () => {
