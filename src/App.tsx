@@ -39,6 +39,21 @@ type GuitarNote = {
 
 type GuitarNoteQuestion = GuitarNote & { location: GuitarNoteLocation }
 
+type QuestionData = {
+    questionTime: number;
+    responseTime: number | null;
+    isCorrect: boolean | null;
+    note: GuitarNoteQuestion;
+};
+
+type SessionStats = {
+    totalQuestions: number;
+    correctAnswers: number;
+    incorrectAnswers: number;
+    correctPercentage: number;
+    averageResponseTime: number;
+};
+
 const guitarNotes : GuitarNote[] = [
     {
         id: "E2", image: E2, title: "E", locations: [{string: "6", fret: "0"}]
@@ -291,8 +306,71 @@ function RadioLabel({htmlFor, content}: RadioLabelProps) {
 }
 
 function App() {
+    // Session state
+    const [isSessionActive, setIsSessionActive] = useState<boolean>(false);
+    const [sessionData, setSessionData] = useState<QuestionData[]>([]);
+    const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
+    const [showStats, setShowStats] = useState<boolean>(false);
+    const [currentQuestionStartTime, setCurrentQuestionStartTime] = useState<number | null>(null);
+
+    const startSession = () => {
+        setIsSessionActive(true);
+        setSessionData([]);
+        setSessionStats(null);
+        setShowStats(false);
+        nextQuestion(true);
+    };
+
+    const stopSession = () => {
+        setIsSessionActive(false);
+
+        // Calculate session statistics
+        if (sessionData.length > 0) {
+            const completedQuestions = sessionData.filter(q => q.isCorrect !== null);
+            const correctAnswers = sessionData.filter(q => q.isCorrect === true).length;
+            const incorrectAnswers = sessionData.filter(q => q.isCorrect === false).length;
+            const totalQuestions = completedQuestions.length;
+
+            const responseTimes = completedQuestions
+                .filter(q => q.responseTime !== null)
+                .map(q => q.responseTime as number);
+
+            const averageResponseTime = responseTimes.length > 0 
+                ? responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length / 1000 // Convert to seconds
+                : 0;
+
+            const stats: SessionStats = {
+                totalQuestions,
+                correctAnswers,
+                incorrectAnswers,
+                correctPercentage: totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0,
+                averageResponseTime
+            };
+
+            setSessionStats(stats);
+            setShowStats(true);
+        }
+    };
+
     const validateAnswer = () => {
-        if (selectedNote === currentNote.title && fretNumber === currentNote.location.fret) {
+        const isCorrect = selectedNote === currentNote.title && fretNumber === currentNote.location.fret;
+
+        if (isSessionActive && currentQuestionStartTime !== null) {
+            const responseTime = Date.now() - currentQuestionStartTime;
+
+            // Update the last question in sessionData with the response
+            setSessionData(prevData => {
+                const updatedData = [...prevData];
+                if (updatedData.length > 0) {
+                    const lastQuestion = updatedData[updatedData.length - 1];
+                    lastQuestion.responseTime = responseTime;
+                    lastQuestion.isCorrect = isCorrect;
+                }
+                return updatedData;
+            });
+        }
+
+        if (isCorrect) {
             nextQuestion();
             setCorrectAnswer(true);
         } else {
@@ -300,12 +378,61 @@ function App() {
         }
     };
 
-    const nextQuestion = () => {
+    const nextQuestion = (isFirstQuestion = false) => {
+        // If we're moving to the next question after a wrong answer without validating,
+        // we need to record the current attempt as incorrect
+        if (wrongAnswer && isSessionActive && currentQuestionStartTime !== null) {
+            const responseTime = Date.now() - currentQuestionStartTime;
+
+            // Update the last question in sessionData with the response
+            setSessionData(prevData => {
+                const updatedData = [...prevData];
+                if (updatedData.length > 0) {
+                    const lastQuestion = updatedData[updatedData.length - 1];
+                    // Only update if it hasn't been updated already
+                    if (lastQuestion.isCorrect === null) {
+                        lastQuestion.responseTime = responseTime;
+                        lastQuestion.isCorrect = false;
+                    }
+                }
+                return updatedData;
+            });
+        }
+
         setSelectedNote(null);
         setFretNumber(null);
         setWrongAnswer(false);
-        setCurrentNote(getRandomNote());
-    }
+
+        const newNote = getRandomNote();
+        setCurrentNote(newNote);
+
+        if (isSessionActive) {
+            const now = Date.now();
+            setCurrentQuestionStartTime(now);
+
+            // Don't add a new question data entry if this is the first question after starting a session
+            // and we're explicitly calling nextQuestion(true)
+            if (!isFirstQuestion) {
+                setSessionData(prevData => [
+                    ...prevData,
+                    {
+                        questionTime: now,
+                        responseTime: null,
+                        isCorrect: null,
+                        note: newNote
+                    }
+                ]);
+            } else {
+                // For the first question, initialize the session data
+                setSessionData([{
+                    questionTime: now,
+                    responseTime: null,
+                    isCorrect: null,
+                    note: newNote
+                }]);
+            }
+        }
+    };
 
     const [currentNote, setCurrentNote] = useState(getRandomNote);
     const [selectedNote, setSelectedNote] = useState<string | null>(null);
@@ -333,16 +460,75 @@ function App() {
         <div className={'container mx-auto p-5'}>
 
             <div className={'border border-gray-400 p-5 flex justify-between items-center rounded-3xl mb-5'}>
-
                 <a
                     href={"https://guitarfretwizard.com"}
                     className={'block text-3xl text-gray-900 font-extrabold leading-none'}>guitar fret wizard</a>
 
-
-                {/*<MenuIcon/>*/}
-                {/*<CloseIcon/>*/}
-
+                <div>
+                    {!isSessionActive ? (
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold"
+                            onClick={startSession}
+                        >
+                            Start Session
+                        </motion.button>
+                    ) : (
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold"
+                            onClick={stopSession}
+                        >
+                            Stop Session
+                        </motion.button>
+                    )}
+                </div>
             </div>
+
+            {showStats && sessionStats && (
+                <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="col-span-3 border border-gray-400 p-5 rounded-3xl mb-5 bg-white"
+                >
+                    <h2 className="text-2xl text-gray-900 font-extrabold mb-4">Session Statistics</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="border border-gray-300 p-4 rounded-xl text-center">
+                            <div className="text-3xl font-bold">{sessionStats.totalQuestions}</div>
+                            <div className="text-sm text-gray-600">Total Questions</div>
+                        </div>
+                        <div className="border border-gray-300 p-4 rounded-xl text-center">
+                            <div className="text-3xl font-bold text-green-600">{sessionStats.correctAnswers}</div>
+                            <div className="text-sm text-gray-600">Correct</div>
+                        </div>
+                        <div className="border border-gray-300 p-4 rounded-xl text-center">
+                            <div className="text-3xl font-bold text-red-600">{sessionStats.incorrectAnswers}</div>
+                            <div className="text-sm text-gray-600">Incorrect</div>
+                        </div>
+                        <div className="border border-gray-300 p-4 rounded-xl text-center">
+                            <div className="text-3xl font-bold">{sessionStats.correctPercentage.toFixed(1)}%</div>
+                            <div className="text-sm text-gray-600">Accuracy</div>
+                        </div>
+                    </div>
+                    <div className="mt-4 border border-gray-300 p-4 rounded-xl text-center">
+                        <div className="text-3xl font-bold">{sessionStats.averageResponseTime.toFixed(2)}s</div>
+                        <div className="text-sm text-gray-600">Average Response Time</div>
+                    </div>
+                    <div className="mt-4 text-center">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold"
+                            onClick={() => setShowStats(false)}
+                        >
+                            Close
+                        </motion.button>
+                    </div>
+                </motion.div>
+            )}
 
             <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-3 md:col-span-1 border border-gray-400 p-10 rounded-3xl justify-center flex flex-col">
@@ -351,21 +537,11 @@ function App() {
                         src={currentNote.image}
                         alt={currentNote.id}/>
 
-                    {/*<div className={'flex justify-between'}>*/}
-
-                    {/*    <div>*/}
-                    {/*        <div>Correct</div>*/}
-                    {/*    </div>*/}
-
-                    {/*    <div>*/}
-                    {/*        <div>Wrong</div>*/}
-                    {/*    </div>*/}
-
-                    {/*    <div>*/}
-                    {/*        <div>Percent</div>*/}
-                    {/*    </div>*/}
-
-                    {/*</div>*/}
+                    {isSessionActive && (
+                        <div className="mt-4 text-center">
+                            <div className="text-sm text-gray-600">Session Active</div>
+                        </div>
+                    )}
                 </div>
                 <div className="col-span-3 md:col-span-2 border border-gray-400 p-10 rounded-3xl">
 

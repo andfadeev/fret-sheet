@@ -4,7 +4,7 @@
 - deploy to coolify / github pages
 - add dark mode
 - add nice footer
-- better algorith to track questions in a sessions
+- ✅ add practice session tracking with statistics
 - add google analytics
 - get domain name
 - marketing
